@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlackBerry Classic IMEI Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        select, button, input[type="checkbox"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #imei-output {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            word-break: break-all;
+            position: relative;
+        }
+        #copy-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #copy-btn:hover {
+            background-color: #218838;
+        }
+        .disclaimer {
+            font-size: 14px;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .disclaimer h3 {
+            margin: 0 0 10px;
+            color: #721c24;
+        }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        .checkbox-label {
+            display: block;
+            padding: 5px 0;
+            font-size: 14px;
+            white-space: normal;
+            width: 100%;
+        }
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @media (max-width: 400px) {
+            .checkbox-label {
+                font-size: 12px;
+            }
+            select, button, input[type="checkbox"] {
+                font-size: 14px;
+            }
+            #copy-btn {
+                position: static;
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BlackBerry Classic IMEI Generator</h1>
+        <div class="disclaimer">
+            <h3>Important Disclaimer</h3>
+            <p>This tool generates random IMEI numbers for testing and educational purposes only. These IMEIs are not real, not registered with any authority (e.g., GSMA), and must not be used for any real-world devices, networks, or illegal activities. Using generated IMEIs for fraudulent purposes is strictly prohibited and may violate local laws. The creators of this tool are not responsible for any misuse or consequences arising from its use.</p>
+        </div>
+        <label for="provider">Select Provider/Region:</label>
+        <select id="provider">
+            <option value="35847405">International/Global Unlocked</option>
+            <option value="35989205">North America (AT&T)</option>
+            <option value="35847405">Europe/Asia Unlocked</option>
+            <option value="35847405">US Unlocked/Multi-carrier</option>
+            <option value="35989205">Canada (Rogers)</option>
+            <option value="35989205">US CDMA (Verizon)</option>
+        </select>
+        <label class="checkbox-label">
+            <input type="checkbox" id="terms-agree" onchange="toggleGenerateButton()"> I agree that I will use this tool for testing purposes only and not for any illegal or unauthorized activities.
+        </label>
+        <button id="generate-btn" onclick="generateIMEI()" disabled>Generate IMEI</button>
+        <div id="imei-output">Click "Generate IMEI" to create a random IMEI after agreeing to the terms.<button id="copy-btn" onclick="copyToClipboard()" style="display:none;">Copy to Clipboard</button></div>
+        <div class="note">
+            <p><strong>Legal Notice:</strong> Generated IMEIs are mock numbers and may coincidentally match real IMEIs, but they are not valid for use in any real-world application. Always obtain legitimate IMEIs from authorized devices. For official IMEI verification, consult GSMA or your device manufacturer. Misuse of this tool may result in legal consequences.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleGenerateButton() {
+            const termsCheckbox = document.getElementById('terms-agree');
+            const generateButton = document.getElementById('generate-btn');
+            generateButton.disabled = !termsCheckbox.checked;
+        }
+
+        function calculateLuhnCheckDigit(imeiPartial) {
+            let total = 0;
+            for (let i = 0; i < imeiPartial.length; i++) {
+                let digit = parseInt(imeiPartial[i]);
+                if (i % 2 === 1) {
+                    let doubled = digit * 2;
+                    total += doubled > 9 ? (Math.floor(doubled / 10) + (doubled % 10)) : doubled;
+                } else {
+                    total += digit;
+                }
+            }
+            let checkDigit = (10 - (total % 10)) % 10;
+            return checkDigit.toString();
+        }
+
+        function generateIMEI() {
+            const termsCheckbox = document.getElementById('terms-agree');
+            if (!termsCheckbox.checked) {
+                alert('You must agree to the terms of use before generating an IMEI.');
+                return;
+            }
+            alert('Reminder: Generated IMEIs are for testing and educational purposes only. Do not use them for real devices, networks, or illegal activities. Misuse may lead to legal consequences.');
+            const providerSelect = document.getElementById('provider');
+            const tac = providerSelect.value;
+            let serial = '';
+            for (let i = 0; i < 6; i++) {
+                serial += Math.floor(Math.random() * 10).toString();
+            }
+            const imeiPartial = tac + serial;
+            const checkDigit = calculateLuhnCheckDigit(imeiPartial);
+            const imei = imeiPartial + checkDigit;
+            const imeiOutput = document.getElementById('imei-output');
+            imeiOutput.textContent = imei;
+            document.getElementById('copy-btn').style.display = 'inline-block';
+        }
+
+        function copyToClipboard() {
+            const imeiOutput = document.getElementById('imei-output');
+            navigator.clipboard.writeText(imeiOutput.textContent)
+                .then(() => alert('IMEI copied to clipboard!'))
+                .catch(err => alert('Failed to copy IMEI: ' + err));
+        }
+    </script>
+</body>
+</html>
