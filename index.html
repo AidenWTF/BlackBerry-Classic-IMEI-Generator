@@ -49,22 +49,29 @@
             background-color: #e9ecef;
             border-radius: 4px;
             word-break: break-all;
-            position: relative;
         }
         #copy-btn {
-            padding: 5px 10px;
+            padding: 10px;
             font-size: 14px;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
             background-color: #28a745;
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            display: none;
+            margin-top: 10px;
         }
         #copy-btn:hover {
             background-color: #218838;
+        }
+        #check-link {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+        #check-link:hover {
+            text-decoration: underline;
         }
         .disclaimer {
             font-size: 14px;
@@ -102,11 +109,6 @@
             select, button, input[type="checkbox"] {
                 font-size: 14px;
             }
-            #copy-btn {
-                position: static;
-                margin-top: 10px;
-                width: 100%;
-            }
         }
     </style>
 </head>
@@ -115,7 +117,7 @@
         <h1>BlackBerry Classic IMEI Generator</h1>
         <div class="disclaimer">
             <h3>Important Disclaimer</h3>
-            <p>This tool generates random IMEI numbers for testing and educational purposes only. These IMEIs are not real, not registered with any authority (e.g., GSMA), and must not be used for any real-world devices, networks, or illegal activities. Using generated IMEIs for fraudulent purposes is strictly prohibited and may violate local laws. The creators of this tool are not responsible for any misuse or consequences arising from its use.</p>
+            <p>This is for testing only. IMEIs aren’t real or registered (e.g., with GSMA) and can’t be used on real devices or for illegal stuff. Fraud is not okay and might break laws. We’re not responsible for any issues!</p>
         </div>
         <label for="provider">Select Provider/Region:</label>
         <select id="provider">
@@ -130,7 +132,9 @@
             <input type="checkbox" id="terms-agree" onchange="toggleGenerateButton()"> I agree that I will use this tool for testing purposes only and not for any illegal or unauthorized activities.
         </label>
         <button id="generate-btn" onclick="generateIMEI()" disabled>Generate IMEI</button>
-        <div id="imei-output">Click "Generate IMEI" to create a random IMEI after agreeing to the terms.<button id="copy-btn" onclick="copyToClipboard()" style="display:none;">Copy to Clipboard</button></div>
+        <div id="imei-output">Click "Generate IMEI" to create a random IMEI after agreeing to the terms.</div>
+        <button id="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <a id="check-link" href="#" target="_blank"></a>
         <div class="note">
             <p><strong>Legal Notice:</strong> Generated IMEIs are mock numbers and may coincidentally match real IMEIs, but they are not valid for use in any real-world application. Always obtain legitimate IMEIs from authorized devices. For official IMEI verification, consult GSMA or your device manufacturer. Misuse of this tool may result in legal consequences.</p>
         </div>
@@ -176,7 +180,10 @@
             const imei = imeiPartial + checkDigit;
             const imeiOutput = document.getElementById('imei-output');
             imeiOutput.textContent = imei;
-            document.getElementById('copy-btn').style.display = 'inline-block';
+            document.getElementById('copy-btn').style.display = 'block';
+            const checkLink = document.getElementById('check-link');
+            checkLink.href = `https://www.imei.info/de/?imei=${imei}`;
+            checkLink.textContent = 'Check IMEI on imei.info';
         }
 
         function copyToClipboard() {
